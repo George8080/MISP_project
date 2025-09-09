@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<int> greedyMISP(vector<vector<int>> &adj)
+vector<int> greedyMISP(vector<vector<int>> &adj, int d_level, int alpha)
 {
     int n = adj.size();
     vector<int> degree(n);
@@ -14,17 +14,38 @@ vector<int> greedyMISP(vector<vector<int>> &adj)
     for (int remaining = n; remaining > 0;)
     {
         int v = -1, bestDeg = INT_MAX;
+        priority_queue<pair<int, int>> bestDegs;
         for (int i = 0; i < n; i++)
         {
-            if (!removed[i] && degree[i] < bestDeg)
+            if (!removed[i])
             {
-                bestDeg = degree[i];
-                v = i;
+                if (degree[i] < bestDeg)
+                {
+                    bestDeg = degree[i];
+                    v = i;
+                }
+                bestDegs.push({degree[i], i});
+                if (bestDegs.size() > alpha)
+                {
+                    bestDegs.pop();
+                }
             }
         }
 
         if (v == -1)
             break;
+
+        int r = rand() % 100 + 1;
+
+        if (r > d_level)
+        {
+            int del = rand() % bestDegs.size();
+            for (int i = 0; i < del; i++)
+            {
+                bestDegs.pop();
+            }
+            v = bestDegs.top().second;
+        }
 
         independentSet.push_back(v);
 
@@ -43,8 +64,18 @@ vector<int> greedyMISP(vector<vector<int>> &adj)
     return independentSet;
 }
 
+bool is_int(char const *argv)
+{
+    istringstream in(argv);
+    int i;
+    if (in >> i && in.eof())
+        return true;
+    return false;
+}
+
 int main(int argc, char const *argv[])
 {
+    srand(time(0));
     /*
     cout << "argc: " << argc << endl;
     for (int i = 0; i < argc; ++i)
@@ -54,12 +85,16 @@ int main(int argc, char const *argv[])
     */
 
     // cout << "Comparation: " << strcmp(argv[1], "-i") << endl;
-    if (argc != 3 || strcmp(argv[1], "-i") != 0)
+    if (argc != 5 || (strcmp(argv[1], "-i") != 0 ||
+                      !(is_int(argv[3]) && atoi(argv[3]) >= 0 && atoi(argv[3]) <= 100) ||
+                      !(is_int(argv[4]) && atoi(argv[4]) >= 1)))
     {
-        cout << "Error, command format must be like this: '" << argv[0] << " -i <file direction>'." << endl;
+        cout << "Error, command format must be like this: '" << argv[0] << " -i <file direction> <determinism level (between 0 and 100)> <alpha value (positive integrer excluding 0)>'." << endl;
         return 0;
     }
 
+    int d_level = atoi(argv[3]);
+    int alpha = atoi(argv[4]);
     // ifstream file("../dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
     ifstream file(argv[2]);
     if (!file)
@@ -96,7 +131,7 @@ int main(int argc, char const *argv[])
     }
 
     auto start_time = chrono::high_resolution_clock::now();
-    vector<int> misp = greedyMISP(adj);
+    vector<int> misp = greedyMISP(adj, d_level, alpha);
     auto end_time = chrono::high_resolution_clock::now();
     auto duration_time = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
 
