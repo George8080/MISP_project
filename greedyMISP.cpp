@@ -45,22 +45,13 @@ vector<int> greedyMISP(vector<vector<int>> &adj)
 
 int main(int argc, char const *argv[])
 {
-    /*
-    cout << "argc: " << argc << endl;
-    for (int i = 0; i < argc; ++i)
-    {
-        cout << argv[i] << "\n";
-    }
-    */
-
-    // cout << "Comparation: " << strcmp(argv[1], "-i") << endl;
     if (argc != 3 || strcmp(argv[1], "-i") != 0)
     {
         cout << "Error, command format must be like this: '" << argv[0] << " -i <file direction>'." << endl;
         return 0;
     }
 
-    // ifstream file("../dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
+    // ifstream file("./dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
     ifstream file(argv[2]);
     if (!file)
     {
@@ -109,7 +100,7 @@ int main(int argc, char const *argv[])
             if (it != misp.end())
             {
                 verify = false;
-                cout << u << " and " << v << " are conected..." << endl;
+                // cout << u << " and " << v << " are conected..." << endl;
                 break;
             }
         }
@@ -119,16 +110,21 @@ int main(int argc, char const *argv[])
 
     if (verify)
     {
-        cout << "MISP is Correct!" << endl;
-        cout << "Greedy Independent Set: ";
-        for (int v : misp)
-            cout << v << " ";
-        cout << "\n";
-        cout << "Build time: " << duration_time << " ns." << endl;
+        // cout << "MISP is Correct!" << endl;
+        // cout << "Greedy Independent Set: ";
+        // for (int v : misp)
+        //    cout << v << " ";
+        // cout << "\n";
+        // cout << "Build time: " << duration_time << " ns." << endl;
+
+        // cout << endl;
+
+        cout << misp.size() << ", " << duration_time << endl;
     }
     else
     {
-        cout << "Is not a MISP :c" << endl;
+        // cout << "Is not a MISP :c" << endl;
+        cout << 0 << "," << duration_time << endl;
     }
 
     return 0;

@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<int> greedyMISP(vector<vector<int>> &adj, int d_level, int alpha)
+vector<int> greedyRandomMISP(vector<vector<int>> &adj, int d_level, int alpha)
 {
     int n = adj.size();
     vector<int> degree(n);
@@ -76,15 +76,6 @@ bool is_int(char const *argv)
 int main(int argc, char const *argv[])
 {
     srand(time(0));
-    /*
-    cout << "argc: " << argc << endl;
-    for (int i = 0; i < argc; ++i)
-    {
-        cout << argv[i] << "\n";
-    }
-    */
-
-    // cout << "Comparation: " << strcmp(argv[1], "-i") << endl;
     if (argc != 5 || (strcmp(argv[1], "-i") != 0 ||
                       !(is_int(argv[3]) && atoi(argv[3]) >= 0 && atoi(argv[3]) <= 100) ||
                       !(is_int(argv[4]) && atoi(argv[4]) >= 1)))
@@ -95,7 +86,7 @@ int main(int argc, char const *argv[])
 
     int d_level = atoi(argv[3]);
     int alpha = atoi(argv[4]);
-    // ifstream file("../dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
+    // ifstream file("./dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
     ifstream file(argv[2]);
     if (!file)
     {
@@ -131,7 +122,7 @@ int main(int argc, char const *argv[])
     }
 
     auto start_time = chrono::high_resolution_clock::now();
-    vector<int> misp = greedyMISP(adj, d_level, alpha);
+    vector<int> misp = greedyRandomMISP(adj, d_level, alpha);
     auto end_time = chrono::high_resolution_clock::now();
     auto duration_time = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
 
@@ -144,7 +135,7 @@ int main(int argc, char const *argv[])
             if (it != misp.end())
             {
                 verify = false;
-                cout << u << " and " << v << " are conected..." << endl;
+                // cout << u << " and " << v << " are conected..." << endl;
                 break;
             }
         }
@@ -154,16 +145,18 @@ int main(int argc, char const *argv[])
 
     if (verify)
     {
-        cout << "MISP is Correct!" << endl;
-        cout << "Greedy Independent Set: ";
-        for (int v : misp)
-            cout << v << " ";
-        cout << "\n";
-        cout << "Build time: " << duration_time << " ns." << endl;
+        // cout << "MISP is Correct!" << endl;
+        // cout << "Greedy Independent Set: ";
+        // for (int v : misp)
+        //     cout << v << " ";
+        // cout << "\n";
+
+        cout << misp.size() << ", " << duration_time << endl;
     }
     else
     {
-        cout << "Is not a MISP :c" << endl;
+        // cout << "Is not a MISP :c" << endl;
+        cout << 0 << "," << duration_time << endl;
     }
 
     return 0;
