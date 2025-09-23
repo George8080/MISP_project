@@ -1,7 +1,11 @@
+
 #!/usr/bin/env bash
 set -euo pipefail
 
 OUT="results_MISP.csv"
+GREEDY="./greedyMISP.exe" 
+GREEDY_RAN="./greedyRandomMISP.exe"
+DATASET_ROOT="./dataset_grafos_no_dirigidos"
 echo "Size,Density,Number,Greedy_Value,Greedy_Time,GreedyRan_Value,GreedyRan_Time" > "$OUT"
 
 for X in 1000 2000 3000; do
