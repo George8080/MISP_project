@@ -86,7 +86,6 @@ int main(int argc, char const *argv[])
 
     int d_level = atoi(argv[3]);
     int alpha = atoi(argv[4]);
-    // ifstream file("./dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_1.graph");
     ifstream file(argv[2]);
     if (!file)
     {
@@ -104,19 +103,16 @@ int main(int argc, char const *argv[])
 
     while (getline(file, str))
     {
-        // cout << str << endl;
         int c1, c2;
         istringstream ss(str);
         ss >> c1;
 
         if (ss >> c2)
         {
-            // cout << "Hay par: " << c1 << " " << c2 << endl;
             addEdge(c1, c2);
         }
         else
         {
-            // cout << "N es igual a " << c1 << endl;
             adj.resize(c1);
         }
     }
@@ -135,7 +131,6 @@ int main(int argc, char const *argv[])
             if (it != misp.end())
             {
                 verify = false;
-                // cout << u << " and " << v << " are conected..." << endl;
                 break;
             }
         }
@@ -145,17 +140,10 @@ int main(int argc, char const *argv[])
 
     if (verify)
     {
-        // cout << "MISP is Correct!" << endl;
-        // cout << "Greedy Independent Set: ";
-        // for (int v : misp)
-        //     cout << v << " ";
-        // cout << "\n";
-
         cout << misp.size() << ", " << duration_time << endl;
     }
     else
     {
-        // cout << "Is not a MISP :c" << endl;
         cout << 0 << "," << duration_time << endl;
     }
 
