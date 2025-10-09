@@ -158,14 +158,12 @@ void recreateMISP(vector<vector<int>> &adj, vector<int> &degree, vector<int> &in
     }
 }
 
-bool compareMISP(vector<int> &old_misp, vector<int> &misp)
+void compareMISP(vector<int> &new_misp, vector<int> &misp)
 {
-    if (old_misp.size() > misp.size())
+    if (new_misp.size() > misp.size())
     {
-        misp = old_misp;
-        return true;
+        misp = new_misp;
     }
-    return false;
 }
 
 int main(int argc, char const *argv[])
@@ -218,28 +216,42 @@ int main(int argc, char const *argv[])
     int n = adj.size();
     vector<int> degree(n);
     vector<bool> removed(n, false);
-    int cont = 0;
+
+    vector<int> res;
+    vector<long long> times;
+
+    string file_dir = argv[2];
+    size_t pos = file_dir.find("erdos_");
+    string name = "Time_Quality_table_";
+    string name = name + file_dir.substr(pos + 6);
+    name = name + ".csv";
+    ofstream outputFile(name);
+
+    outputFile << "Time, Quality" << endl;
 
     auto start_time = chrono::high_resolution_clock::now();
     vector<int> misp = greedyRandomMISP_init(adj, d_level, alpha, n, degree, removed);
-    while (true)
-    {
-        vector<int> old_misp = misp;
-        int remaining = destroyMISP(adj, misp, removed);
-        recreateMISP(adj, degree, misp, removed, remaining, d_level, alpha);
-        if (compareMISP(old_misp, misp))
-        {
-            cont = 0;
-        }
-        else
-        {
-            cont++;
-            if (cont == 5)
-                break;
-        }
-    }
     auto end_time = chrono::high_resolution_clock::now();
     auto duration_time = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+
+    // times.push_back(duration_time);
+    // res.push_back(misp.size());
+
+    while (duration_time <= time * 1000000000)
+    {
+        times.push_back(duration_time);
+        res.push_back(misp.size());
+        outputFile << duration_time << ", " << misp.size() << endl;
+
+        start_time = chrono::high_resolution_clock::now();
+        vector<int> new_misp = misp;
+        int remaining = destroyMISP(adj, new_misp, removed);
+        recreateMISP(adj, degree, new_misp, removed, remaining, d_level, alpha);
+        compareMISP(new_misp, misp);
+        end_time = chrono::high_resolution_clock::now();
+        duration_time += chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+    }
+    duration_time -= chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
 
     /*
     bool verify = true;
@@ -267,6 +279,7 @@ int main(int argc, char const *argv[])
         cout << 0 << "," << duration_time << endl;
     }
     */
+
     cout << misp.size() << ", " << duration_time << endl;
 
     return 0;
