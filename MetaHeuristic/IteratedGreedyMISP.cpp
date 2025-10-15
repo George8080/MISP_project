@@ -160,6 +160,7 @@ void recreateMISP(vector<vector<int>> &adj, vector<int> &degree, vector<int> &in
 
 void compareMISP(vector<int> &new_misp, vector<int> &misp)
 {
+    cerr << "Comparing " << new_misp.size() << " with " << misp.size() << endl;
     if (new_misp.size() > misp.size())
     {
         misp = new_misp;
@@ -168,8 +169,11 @@ void compareMISP(vector<int> &new_misp, vector<int> &misp)
 
 int main(int argc, char const *argv[])
 {
+    // cout << argc << endl;
+    // for (int i = 0; i < argc; i++)
+    //     cout << i << ": " << argv[i] << endl;
     srand(time(0));
-    if (argc != 5 || (strcmp(argv[1], "-i") != 0 ||
+    if (argc != 7 || (strcmp(argv[1], "-i") != 0 ||
                       strcmp(argv[3], "-t") != 0 ||
                       !(is_int(argv[4]) && atoi(argv[4]) >= 1) ||
                       !(is_int(argv[5]) && atoi(argv[5]) >= 0 && atoi(argv[5]) <= 100) ||
@@ -223,11 +227,11 @@ int main(int argc, char const *argv[])
     string file_dir = argv[2];
     size_t pos = file_dir.find("erdos_");
     string name = "Time_Quality_table_";
-    string name = name + file_dir.substr(pos + 6);
+    name = name + file_dir.substr(pos + 6);
     name = name + ".csv";
     ofstream outputFile(name);
 
-    outputFile << "Time, Quality" << endl;
+    outputFile << "Time,Quality" << endl;
 
     auto start_time = chrono::high_resolution_clock::now();
     vector<int> misp = greedyRandomMISP_init(adj, d_level, alpha, n, degree, removed);
@@ -241,7 +245,8 @@ int main(int argc, char const *argv[])
     {
         times.push_back(duration_time);
         res.push_back(misp.size());
-        outputFile << duration_time << ", " << misp.size() << endl;
+        outputFile << duration_time << "," << misp.size() << endl;
+        cerr << duration_time << ", " << misp.size() << endl;
 
         start_time = chrono::high_resolution_clock::now();
         vector<int> new_misp = misp;
