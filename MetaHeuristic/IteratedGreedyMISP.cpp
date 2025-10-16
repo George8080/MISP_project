@@ -77,7 +77,7 @@ bool is_int(char const *argv)
 int destroyMISP(vector<vector<int>> &adj, vector<int> &independentSet, vector<bool> &removed)
 {
     int count = 0;
-    int n = rand() % independentSet.size();
+    int n = rand() % (independentSet.size() - independentSet.size() / 2) + independentSet.size() / 2 + 1;
     for (int i = 0; i < n; i++)
     {
         int del = rand() % independentSet.size();
@@ -89,6 +89,8 @@ int destroyMISP(vector<vector<int>> &adj, vector<int> &independentSet, vector<bo
             count++;
             for (int j : adj[u])
             {
+                if (j == independentSet[del])
+                    continue;
                 if (find(independentSet.begin(), independentSet.end(), j) != independentSet.end())
                 {
                     removed[u] = true;
@@ -97,7 +99,6 @@ int destroyMISP(vector<vector<int>> &adj, vector<int> &independentSet, vector<bo
                 }
             }
         }
-
         independentSet.erase(independentSet.begin() + del);
     }
     return count;
@@ -158,11 +159,12 @@ void recreateMISP(vector<vector<int>> &adj, vector<int> &degree, vector<int> &in
     }
 }
 
-void compareMISP(vector<int> &new_misp, vector<int> &misp)
+void compareMISP(vector<int> &new_misp, vector<int> &misp, vector<bool> &new_removed, vector<bool> &removed)
 {
-    cerr << "Comparing " << new_misp.size() << " with " << misp.size() << endl;
+    // cerr << "Comparing " << new_misp.size() << " with " << misp.size() << endl;
     if (new_misp.size() > misp.size())
     {
+        removed = new_removed;
         misp = new_misp;
     }
 }
@@ -226,7 +228,7 @@ int main(int argc, char const *argv[])
 
     string file_dir = argv[2];
     size_t pos = file_dir.find("erdos_");
-    string name = "Time_Quality_table_";
+    string name = "./TimeQuality_Results/Time_Quality_table_";
     name = name + file_dir.substr(pos + 6);
     name = name + ".csv";
     ofstream outputFile(name);
@@ -246,17 +248,26 @@ int main(int argc, char const *argv[])
         times.push_back(duration_time);
         res.push_back(misp.size());
         outputFile << duration_time << "," << misp.size() << endl;
-        cerr << duration_time << ", " << misp.size() << endl;
+        // cerr << duration_time << ", " << misp.size() << endl;
+        vector<int> last_misp = misp;
 
         start_time = chrono::high_resolution_clock::now();
         vector<int> new_misp = misp;
-        int remaining = destroyMISP(adj, new_misp, removed);
-        recreateMISP(adj, degree, new_misp, removed, remaining, d_level, alpha);
-        compareMISP(new_misp, misp);
+        vector<bool> new_removed = removed;
+        int remaining = destroyMISP(adj, new_misp, new_removed);
+        recreateMISP(adj, degree, new_misp, new_removed, remaining, d_level, alpha);
+        compareMISP(new_misp, misp, new_removed, removed);
         end_time = chrono::high_resolution_clock::now();
         duration_time += chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+        if (duration_time > time * 1000000000)
+        {
+            duration_time -= chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+            cout << last_misp.size() << ',' << duration_time << endl;
+            break;
+        }
     }
-    duration_time -= chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+
+    // cout << duration_time << "," << misp.size() << endl;
 
     /*
     bool verify = true;
@@ -284,8 +295,6 @@ int main(int argc, char const *argv[])
         cout << 0 << "," << duration_time << endl;
     }
     */
-
-    cout << misp.size() << ", " << duration_time << endl;
 
     return 0;
 }
