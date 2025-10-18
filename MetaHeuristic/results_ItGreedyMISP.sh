@@ -10,6 +10,7 @@ echo "Size,Density,Number,IterativeGreedy_Value,IterativeGreedy_Time" > "$OUT"
 for X in 1000 2000 3000; do
   for Y in 0.{1..9}; do
     for Z in {1..30}; do
+      echo "Size $X ; Density $Y ; Iteration $Z :"
       FILE=./dataset_grafos_no_dirigidos/new_"$X"_dataset/erdos_n"$X"_p0c"$Y"_"$Z".graph
       IFS=, read -r R1 R2 < <(./IteratedGreedyMISP.exe -i "$FILE" -t 10 40 10)
       echo "$X,$Y,$Z,$R1,$R2" >> "$OUT"

@@ -159,14 +159,16 @@ void recreateMISP(vector<vector<int>> &adj, vector<int> &degree, vector<int> &in
     }
 }
 
-void compareMISP(vector<int> &new_misp, vector<int> &misp, vector<bool> &new_removed, vector<bool> &removed)
+bool compareMISP(vector<int> &new_misp, vector<int> &misp, vector<bool> &new_removed, vector<bool> &removed)
 {
     // cerr << "Comparing " << new_misp.size() << " with " << misp.size() << endl;
     if (new_misp.size() > misp.size())
     {
         removed = new_removed;
         misp = new_misp;
+        return true;
     }
+    return false;
 }
 
 int main(int argc, char const *argv[])
@@ -239,7 +241,10 @@ int main(int argc, char const *argv[])
     vector<int> misp = greedyRandomMISP_init(adj, d_level, alpha, n, degree, removed);
     auto end_time = chrono::high_resolution_clock::now();
     auto duration_time = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+    outputFile << duration_time << "," << misp.size() << endl;
+    cerr << duration_time << ", " << misp.size() << endl;
 
+    auto last_time_update = duration_time;
     // times.push_back(duration_time);
     // res.push_back(misp.size());
 
@@ -247,7 +252,6 @@ int main(int argc, char const *argv[])
     {
         times.push_back(duration_time);
         res.push_back(misp.size());
-        outputFile << duration_time << "," << misp.size() << endl;
         // cerr << duration_time << ", " << misp.size() << endl;
         vector<int> last_misp = misp;
 
@@ -256,13 +260,19 @@ int main(int argc, char const *argv[])
         vector<bool> new_removed = removed;
         int remaining = destroyMISP(adj, new_misp, new_removed);
         recreateMISP(adj, degree, new_misp, new_removed, remaining, d_level, alpha);
-        compareMISP(new_misp, misp, new_removed, removed);
+        bool change = compareMISP(new_misp, misp, new_removed, removed);
         end_time = chrono::high_resolution_clock::now();
         duration_time += chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+        if (change)
+        {
+            outputFile << duration_time << "," << misp.size() << endl;
+            cerr << duration_time << "," << misp.size() << endl;
+            last_time_update = duration_time;
+        }
         if (duration_time > time * 1000000000)
         {
-            duration_time -= chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
-            cout << last_misp.size() << ',' << duration_time << endl;
+            cout << last_misp.size() << ',' << last_time_update << endl;
+            cerr << last_misp.size() << ',' << last_time_update << endl;
             break;
         }
     }
